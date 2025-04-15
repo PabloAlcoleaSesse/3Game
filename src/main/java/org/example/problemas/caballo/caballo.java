@@ -78,4 +78,7 @@ public class caballo {
         }
         return sb.toString();
     }
+    public List<Ficha> getMoveHistory() {
+        return moveHistory;
+    }
 }
