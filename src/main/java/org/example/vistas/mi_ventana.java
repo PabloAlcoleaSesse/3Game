@@ -1,84 +1,52 @@
 package org.example.vistas;
 
+import org.example.vistas.JuegoCaballo.panelCaballo;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
 public class mi_ventana extends JFrame {
     public mi_ventana() {
-        setTitle("Inicio");
+        setSize(500, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
-        setMinimumSize(new java.awt.Dimension(600, 500));
+        setTitle("Mi Ventana");
 
-        // Panel para la creacion de UI personalizada
-        JPanel panel = new JPanel(new BorderLayout());
-        getContentPane().add(panel);
+        // Create CardLayout and main panel
+        CardLayout cardLayout = new CardLayout();
+        JPanel mainPanel = new JPanel(cardLayout);
 
-        // Título
-        JLabel titulo = new JLabel("Selecciona una Opcion");
-        titulo.setFont(new Font("Poppins", Font.BOLD, 24));
-        titulo.setBorder(BorderFactory.createEmptyBorder(20, 10, 20, 10));
-        panel.add(titulo, BorderLayout.NORTH);
+        // Create the Inicio panel
+        JPanel panelInicio = new JPanel();
+        panelInicio.setLayout(new BoxLayout(panelInicio, BoxLayout.Y_AXIS));
+        JLabel labelInicio = new JLabel("Inicio");
+        panelInicio.add(labelInicio);
 
-        // Panel para las tarjetas
-        JPanel cardPanel = new JPanel();
-        cardPanel.setLayout(new BoxLayout(cardPanel, BoxLayout.Y_AXIS)); // Use vertical layout for cards
-        cardPanel.add(crearTarjeta("Opcion 1", "../Recursos/img/knight.png"));
-        cardPanel.add(Box.createVerticalStrut(20));
-        cardPanel.add(crearTarjeta("Opción 2", "ruta/a/imagen2.png"));
-        cardPanel.add(Box.createVerticalStrut(20));
-        cardPanel.add(crearTarjeta("Opción 3", "ruta/a/imagen3.png"));
+        JPanel panelOpcion = new JPanel();
+        panelOpcion.setLayout(new FlowLayout());
 
-        // Add the cardPanel to the main panel
-        panel.add(cardPanel, BorderLayout.CENTER);
+        JButton botonTorres = new JButton("Torres de Hanoi");
+        JButton botonCaballo = new JButton("Caballo");
+        JButton botonReinas = new JButton("Reinas");
 
+        panelOpcion.add(botonTorres);
+        panelOpcion.add(botonCaballo);
+        panelOpcion.add(botonReinas);
+
+        panelInicio.add(panelOpcion);
+
+        // Add the Inicio panel to the main panel
+        mainPanel.add(panelInicio, "Inicio");
+
+        // Create and add the Caballo panel
+        panelCaballo caballoPanel = new panelCaballo(cardLayout, mainPanel);
+        mainPanel.add(caballoPanel, "Caballo");
+
+        // Add action listener to switch to the Caballo panel
+        botonCaballo.addActionListener(e -> cardLayout.show(mainPanel, "Caballo"));
+
+        // Add the main panel to the frame
+        add(mainPanel);
         setVisible(true);
-    }  
-    private JPanel crearTarjeta(String titulo, String rutaImagen) {
-        // Define the colors as final variables
-        final Color base = new Color(255, 255, 255);
-        final Color hover = new Color(240, 240, 240);
-
-        JPanel tarjeta = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                setBackground(base);
-            }
-        };
-
-        tarjeta.setPreferredSize(new Dimension(500, 150));
-        tarjeta.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
-        tarjeta.setBorder(BorderFactory.createLineBorder(Color.GRAY, 1));
-        tarjeta.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        tarjeta.setLayout(new BorderLayout(10, 10));
-        tarjeta.setBackground(base);
-
-        // Add only the title label
-        JLabel titleLabel = new JLabel(titulo);
-        titleLabel.setFont(new Font("Poppins", Font.PLAIN, 18));
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        tarjeta.add(titleLabel, BorderLayout.CENTER);
-
-        // Add hover effect
-        tarjeta.addMouseListener(new MouseAdapter() {
-            public void mouseEntered(MouseEvent e) {
-                tarjeta.setBackground(hover);
-                tarjeta.repaint();
-            }
-
-            public void mouseExited(MouseEvent e) {
-                tarjeta.setBackground(base);
-                tarjeta.repaint();
-            }
-
-            public void mouseClicked(MouseEvent e) {
-                JOptionPane.showMessageDialog(null, "Has seleccionado: " + titulo);
-            }
-        });
-
-        return tarjeta;
     }
-
 }
