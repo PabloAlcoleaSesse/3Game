@@ -1,15 +1,27 @@
 package org.example.vistas;
 
-import org.example.vistas.JuegoCaballo.panelCaballo;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+
+import org.example.vistas.JuegoCaballo.panelCaballo;
 
 public class mi_ventana extends JFrame {
     public mi_ventana() {
-        setSize(500, 500);
+        setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setMinimumSize(new Dimension(800, 600));
         setTitle("Mi Ventana");
 
         // Create CardLayout and main panel
@@ -17,23 +29,36 @@ public class mi_ventana extends JFrame {
         JPanel mainPanel = new JPanel(cardLayout);
 
         // Create the Inicio panel
-        JPanel panelInicio = new JPanel();
-        panelInicio.setLayout(new BoxLayout(panelInicio, BoxLayout.Y_AXIS));
-        JLabel labelInicio = new JLabel("Inicio");
-        panelInicio.add(labelInicio);
+        JPanel panelInicio = new JPanel(new BorderLayout());
+        panelInicio.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Add padding
 
-        JPanel panelOpcion = new JPanel();
-        panelOpcion.setLayout(new FlowLayout());
+        // Title at the top
+        JLabel labelInicio = new JLabel("Inicio", SwingConstants.CENTER);
+        labelInicio.setFont(new Font("Arial", Font.BOLD, 24));
+        panelInicio.add(labelInicio, BorderLayout.NORTH);
+
+        // Buttons in the center
+        JPanel panelOpcion = new JPanel(new GridBagLayout());
+        panelOpcion.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0)); // Add spacing between buttons
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // Add spacing around buttons
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JButton botonTorres = new JButton("Torres de Hanoi");
         JButton botonCaballo = new JButton("Caballo");
         JButton botonReinas = new JButton("Reinas");
 
-        panelOpcion.add(botonTorres);
-        panelOpcion.add(botonCaballo);
-        panelOpcion.add(botonReinas);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panelOpcion.add(botonTorres, gbc);
 
-        panelInicio.add(panelOpcion);
+        gbc.gridy = 1;
+        panelOpcion.add(botonCaballo, gbc);
+
+        gbc.gridy = 2;
+        panelOpcion.add(botonReinas, gbc);
+
+        panelInicio.add(panelOpcion, BorderLayout.CENTER);
 
         // Add the Inicio panel to the main panel
         mainPanel.add(panelInicio, "Inicio");

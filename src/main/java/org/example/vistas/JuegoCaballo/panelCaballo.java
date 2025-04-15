@@ -1,11 +1,29 @@
 package org.example.vistas.JuegoCaballo;
 
-import org.example.problemas.caballo.caballo;
-import org.example.problemas.Ficha;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
+
+import org.example.problemas.Ficha;
+import org.example.problemas.caballo.caballo;
 
 public class panelCaballo extends JPanel {
     private CardLayout cardLayout;
@@ -20,7 +38,15 @@ public class panelCaballo extends JPanel {
         setLayout(new BorderLayout());
 
         // Create the board panel
-        boardPanel = new JPanel(new GridLayout(8, 8));
+        boardPanel = new JPanel(new GridLayout(8, 8)) {
+            @Override
+            public Dimension getPreferredSize() {
+                // Ensure the board is square
+                Dimension size = super.getPreferredSize();
+                int side = Math.min(size.width, size.height);
+                return new Dimension(side, side);
+            }
+        };
         boardCells = new JLabel[8][8];
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -75,13 +101,36 @@ public class panelCaballo extends JPanel {
                     // Clear the board
                     for (int i = 0; i < 8; i++) {
                         for (int j = 0; j < 8; j++) {
-                            boardCells[i][j].setText("");
+                            if (boardCells[i][j].getIcon() != null) {
+                                // Keep the number of the movement for previous moves
+                                boardCells[i][j].setIcon(null);
+                            }
                         }
                     }
 
                     // Highlight the current move
                     Ficha move = moveHistory.get(index);
-                    boardCells[move.getFila()][move.getColumna()].setText("♞");
+                
+
+                    // Place the number of the movement on the previous cell
+                    if (index > 0) {
+                        Ficha previousMove = moveHistory.get(index - 1);
+                        boardCells[previousMove.getFila()][previousMove.getColumna()].setText(String.valueOf(index));
+                        boardCells[previousMove.getFila()][previousMove.getColumna()].setFont(new Font("Poppins", Font.PLAIN, 20));
+                        boardCells[previousMove.getFila()][previousMove.getColumna()].setForeground(Color.BLACK);
+
+                    }
+
+                    // Load and scale the knight icon for the current move
+                    ImageIcon originalIcon = new ImageIcon("src/main/java/org/example/Recursos/img/Knight_Icon.png");
+                    Image scaledImage = originalIcon.getImage().getScaledInstance(
+                        boardCells[0][0].getWidth(), // Use the cell's width
+                        boardCells[0][0].getHeight(), // Use the cell's height
+                        Image.SCALE_SMOOTH
+                    );
+                    ImageIcon scaledIcon = new ImageIcon(scaledImage);
+
+                    boardCells[move.getFila()][move.getColumna()].setIcon(scaledIcon);
                     boardCells[move.getFila()][move.getColumna()].setForeground(Color.RED);
 
                     // Update the move history
