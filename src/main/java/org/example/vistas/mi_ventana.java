@@ -4,6 +4,7 @@ import java.awt.*;
 import javax.swing.*;
 import org.example.vistas.JuegoCaballo.panelCaballo;
 import org.example.vistas.JuegoReinas.panelReinas;
+import org.example.vistas.TorresHanoi.panelHanoi;
 
 public class mi_ventana extends JFrame {
     public mi_ventana() {
@@ -87,6 +88,24 @@ public class mi_ventana extends JFrame {
             panelReinas reinasPanel = new panelReinas(cardLayout, mainPanel, boardSize);
             mainPanel.add(reinasPanel, "Reinas");
             cardLayout.show(mainPanel, "Reinas");
+        });
+
+        botonTorres.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog(this, "Enter the number of disks:", "Number of Disks", JOptionPane.QUESTION_MESSAGE);
+            int numDiscos;
+            try {
+                numDiscos = Integer.parseInt(input);
+                if (numDiscos < 1) {
+                    throw new IllegalArgumentException("Number of disks must be at least 1.");
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Invalid input. Defaulting to 3 disks.", "Error", JOptionPane.ERROR_MESSAGE);
+                numDiscos = 3; // Default number of disks
+            }
+
+            panelHanoi hanoiPanel = new panelHanoi(cardLayout, mainPanel, numDiscos);
+            mainPanel.add(hanoiPanel, "Hanoi");
+            cardLayout.show(mainPanel, "Hanoi");
         });
 
         // Add the main panel to the frame
