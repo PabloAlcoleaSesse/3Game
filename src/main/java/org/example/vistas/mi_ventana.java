@@ -1,21 +1,9 @@
 package org.example.vistas;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-
+import java.awt.*;
+import javax.swing.*;
 import org.example.vistas.JuegoCaballo.panelCaballo;
+import org.example.vistas.JuegoReinas.panelReinas;
 
 public class mi_ventana extends JFrame {
     public mi_ventana() {
@@ -63,12 +51,43 @@ public class mi_ventana extends JFrame {
         // Add the Inicio panel to the main panel
         mainPanel.add(panelInicio, "Inicio");
 
-        // Create and add the Caballo panel
-        panelCaballo caballoPanel = new panelCaballo(cardLayout, mainPanel);
-        mainPanel.add(caballoPanel, "Caballo");
-
         // Add action listener to switch to the Caballo panel
-        botonCaballo.addActionListener(e -> cardLayout.show(mainPanel, "Caballo"));
+        botonCaballo.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog(this, "Enter board size (e.g., 8 for 8x8):", "Board Size", JOptionPane.QUESTION_MESSAGE);
+            int boardSize;
+            try {
+                boardSize = Integer.parseInt(input);
+                if (boardSize < 4) {
+                    throw new IllegalArgumentException("Board size must be at least 4.");
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Invalid input. Defaulting to 8x8.", "Error", JOptionPane.ERROR_MESSAGE);
+                boardSize = 8; // Default size
+            }
+
+            panelCaballo caballoPanel = new panelCaballo(cardLayout, mainPanel, boardSize);
+            mainPanel.add(caballoPanel, "Caballo");
+            cardLayout.show(mainPanel, "Caballo");
+        });
+
+        // Add action listener to switch to the Reinas panel
+        botonReinas.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog(this, "Enter board size (e.g., 8 for 8x8):", "Board Size", JOptionPane.QUESTION_MESSAGE);
+            int boardSize;
+            try {
+                boardSize = Integer.parseInt(input);
+                if (boardSize < 4) {
+                    throw new IllegalArgumentException("Board size must be at least 4.");
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Invalid input. Defaulting to 8x8.", "Error", JOptionPane.ERROR_MESSAGE);
+                boardSize = 8; // Default size
+            }
+
+            panelReinas reinasPanel = new panelReinas(cardLayout, mainPanel, boardSize);
+            mainPanel.add(reinasPanel, "Reinas");
+            cardLayout.show(mainPanel, "Reinas");
+        });
 
         // Add the main panel to the frame
         add(mainPanel);

@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class caballo {
-
-    private static final int N = 8;
+    private int N;
     private Ficha[][] board;
     private int[] dx = {2, 1, -1, -2, -2, -1, 1, 2};
     private int[] dy = {1, 2, 2, 1, -1, -2, -2, -1};
     private List<Ficha> moveHistory = new ArrayList<>();
 
-    public caballo() {
+    public caballo(int boardSize) {
+        this.N = boardSize;
         board = new Ficha[N][N];
     }
 
@@ -35,7 +35,8 @@ public class caballo {
             return true;
         }
 
-        for (int i = 0; i < 8; i++) {
+        int[] moveOrder = getMoveOrder(x, y); // Get moves sorted by Warnsdorff's heuristic
+        for (int i : moveOrder) {
             int nextX = x + dx[i];
             int nextY = y + dy[i];
 
@@ -54,30 +55,47 @@ public class caballo {
         return false;
     }
 
+    private int[] getMoveOrder(int x, int y) {
+        int[] moveOrder = new int[8];
+        int[] degree = new int[8];
+
+        for (int i = 0; i < 8; i++) {
+            int nextX = x + dx[i];
+            int nextY = y + dy[i];
+            degree[i] = countValidMoves(nextX, nextY);
+            moveOrder[i] = i;
+        }
+
+        // Sort moves by degree (Warnsdorff's heuristic)
+        for (int i = 0; i < 8; i++) {
+            for (int j = i + 1; j < 8; j++) {
+                if (degree[moveOrder[i]] > degree[moveOrder[j]]) {
+                    int temp = moveOrder[i];
+                    moveOrder[i] = moveOrder[j];
+                    moveOrder[j] = temp;
+                }
+            }
+        }
+
+        return moveOrder;
+    }
+
+    private int countValidMoves(int x, int y) {
+        int count = 0;
+        for (int i = 0; i < 8; i++) {
+            int nextX = x + dx[i];
+            int nextY = y + dy[i];
+            if (isValidMove(nextX, nextY)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     private boolean isValidMove(int x, int y) {
         return (x >= 0 && x < N && y >= 0 && y < N && board[x][y] == null);
     }
 
-    public String getSolutionString() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                sb.append((board[i][j] != null ? "1" : "0") + " ");
-            }
-            sb.append("\n");
-        }
-        return sb.toString();
-    }
-
-    public String getHistoryString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Historial de movimientos:\n");
-        for (int i = 0; i < moveHistory.size(); i++) {
-            Ficha movimiento = moveHistory.get(i);
-            sb.append("Movimiento " + (i + 1) + ": (" + movimiento.getFila() + ", " + movimiento.getColumna() + ")\n");
-        }
-        return sb.toString();
-    }
     public List<Ficha> getMoveHistory() {
         return moveHistory;
     }

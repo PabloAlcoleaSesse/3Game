@@ -1,27 +1,9 @@
 package org.example.vistas.JuegoCaballo;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.List;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
-import javax.swing.Timer;
-
+import javax.swing.*;
 import org.example.problemas.Ficha;
 import org.example.problemas.caballo.caballo;
 
@@ -31,25 +13,27 @@ public class panelCaballo extends JPanel {
     private JPanel boardPanel;
     private JLabel[][] boardCells;
     private JTextArea moveHistoryArea;
+    private int boardSize;
 
-    public panelCaballo(CardLayout cardLayout, JPanel mainPanel) {
+    public panelCaballo(CardLayout cardLayout, JPanel mainPanel, int boardSize) {
         this.cardLayout = cardLayout;
         this.mainPanel = mainPanel;
+        this.boardSize = boardSize;
+
         setLayout(new BorderLayout());
 
         // Create the board panel
-        boardPanel = new JPanel(new GridLayout(8, 8)) {
+        boardPanel = new JPanel(new GridLayout(boardSize, boardSize)) {
             @Override
             public Dimension getPreferredSize() {
-                // Ensure the board is square
                 Dimension size = super.getPreferredSize();
                 int side = Math.min(size.width, size.height);
                 return new Dimension(side, side);
             }
         };
-        boardCells = new JLabel[8][8];
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+        boardCells = new JLabel[boardSize][boardSize];
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
                 boardCells[i][j] = new JLabel("", SwingConstants.CENTER);
                 boardCells[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK));
                 boardCells[i][j].setOpaque(true);
@@ -75,15 +59,21 @@ public class panelCaballo extends JPanel {
 
         // Solve button action
         solveButton.addActionListener(e -> {
-            caballo solver = new caballo();
-            boolean solved = solver.solve();
+            solveButton.setEnabled(false); // Disable button during computation
+            new Thread(() -> {
+                caballo solver = new caballo(boardSize);
+                boolean solved = solver.solve();
 
-            if (solved) {
-                List<Ficha> moveHistory = solver.getMoveHistory();
-                showMovesOnBoard(moveHistory);
-            } else {
-                JOptionPane.showMessageDialog(panelCaballo.this, "No existe solución para el recorrido.");
-            }
+                SwingUtilities.invokeLater(() -> {
+                    if (solved) {
+                        List<Ficha> moveHistory = solver.getMoveHistory();
+                        showMovesOnBoard(moveHistory);
+                    } else {
+                        JOptionPane.showMessageDialog(panelCaballo.this, "No solution exists for the knight's tour.");
+                    }
+                    solveButton.setEnabled(true); // Re-enable button
+                });
+            }).start();
         });
 
         // Back button action
@@ -92,17 +82,16 @@ public class panelCaballo extends JPanel {
 
     private void showMovesOnBoard(List<Ficha> moveHistory) {
         moveHistoryArea.setText(""); // Clear the move history area
-        Timer timer = new Timer(500, new ActionListener() { // Interval of 500 ms
+        Timer timer = new Timer(500, new AbstractAction() { // Interval of 500 ms
             int index = 0;
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (index < moveHistory.size()) {
                     // Clear the board
-                    for (int i = 0; i < 8; i++) {
-                        for (int j = 0; j < 8; j++) {
+                    for (int i = 0; i < boardSize; i++) {
+                        for (int j = 0; j < boardSize; j++) {
                             if (boardCells[i][j].getIcon() != null) {
-                                // Keep the number of the movement for previous moves
                                 boardCells[i][j].setIcon(null);
                             }
                         }
@@ -110,35 +99,30 @@ public class panelCaballo extends JPanel {
 
                     // Highlight the current move
                     Ficha move = moveHistory.get(index);
-                
 
-                    // Place the number of the movement on the previous cell
                     if (index > 0) {
                         Ficha previousMove = moveHistory.get(index - 1);
                         boardCells[previousMove.getFila()][previousMove.getColumna()].setText(String.valueOf(index));
                         boardCells[previousMove.getFila()][previousMove.getColumna()].setFont(new Font("Poppins", Font.PLAIN, 20));
                         boardCells[previousMove.getFila()][previousMove.getColumna()].setForeground(Color.BLACK);
-
                     }
 
-                    // Load and scale the knight icon for the current move
                     ImageIcon originalIcon = new ImageIcon("src/main/java/org/example/Recursos/img/Knight_Icon.png");
                     Image scaledImage = originalIcon.getImage().getScaledInstance(
-                        boardCells[0][0].getWidth(), // Use the cell's width
-                        boardCells[0][0].getHeight(), // Use the cell's height
-                        Image.SCALE_SMOOTH
+                            boardCells[0][0].getWidth(),
+                            boardCells[0][0].getHeight(),
+                            Image.SCALE_SMOOTH
                     );
                     ImageIcon scaledIcon = new ImageIcon(scaledImage);
 
                     boardCells[move.getFila()][move.getColumna()].setIcon(scaledIcon);
                     boardCells[move.getFila()][move.getColumna()].setForeground(Color.RED);
 
-                    // Update the move history
                     moveHistoryArea.append("Move " + (index + 1) + ": (" + move.getFila() + ", " + move.getColumna() + ")\n");
 
                     index++;
                 } else {
-                    ((Timer) e.getSource()).stop(); // Stop the timer when all moves are shown
+                    ((Timer) e.getSource()).stop();
                 }
             }
         });
