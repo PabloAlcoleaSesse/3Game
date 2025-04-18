@@ -15,6 +15,9 @@ public class panelReinas extends JPanel {
     private JLabel[][] boardCells;
     private JTextArea solutionArea;
     private int boardSize;
+    private List<List<Ficha>> allSolutions; // Store all solutions
+    private int currentSolutionIndex = 0; // Track current solution being shown
+    private JButton nextSolutionButton; // Button to show next solution
 
     public panelReinas(CardLayout cardLayout, JPanel mainPanel, int boardSize) {
         this.cardLayout = cardLayout;
@@ -50,9 +53,19 @@ public class panelReinas extends JPanel {
         JScrollPane scrollPane = new JScrollPane(solutionArea);
         add(scrollPane, BorderLayout.EAST);
 
+        // Create a panel for buttons at the top
+        JPanel topPanel = new JPanel(new FlowLayout());
+
         // Solve button
         JButton solveButton = new JButton("Solve N-Queens");
-        add(solveButton, BorderLayout.NORTH);
+        topPanel.add(solveButton);
+
+        // Next solution button (initially disabled)
+        nextSolutionButton = new JButton("Next Solution");
+        nextSolutionButton.setEnabled(false);
+        topPanel.add(nextSolutionButton);
+
+        add(topPanel, BorderLayout.NORTH);
 
         // Back button
         JButton backButton = new JButton("Back to Menu");
@@ -61,6 +74,9 @@ public class panelReinas extends JPanel {
         // Solve button action
         solveButton.addActionListener(e -> {
             solveButton.setEnabled(false); // Disable button during computation
+            nextSolutionButton.setEnabled(false); // Disable next solution button
+            currentSolutionIndex = 0; // Reset solution index
+
             new Thread(() -> {
                 Reinas solver = new Reinas(boardSize);
                 solver.resolver(true); // Find all solutions
@@ -70,16 +86,30 @@ public class panelReinas extends JPanel {
                 db.recordQueensGame(boardSize, solver.getSoluciones());
 
                 SwingUtilities.invokeLater(() -> {
-                    List<List<Ficha>> solutions = solver.getSoluciones();
-                    if (!solutions.isEmpty()) {
-                        solutionArea.setText("Number of solutions: " + solutions.size() + "\n");
-                        showSolutionOnBoard(solutions.get(0)); // Show the first solution
+                    allSolutions = solver.getSoluciones();
+                    if (!allSolutions.isEmpty()) {
+                        solutionArea.setText("Solution " + (currentSolutionIndex + 1) + " of " +
+                                allSolutions.size() + "\n");
+                        showSolutionOnBoard(allSolutions.get(currentSolutionIndex)); // Show the first solution
+
+                        // Enable next solution button if there's more than one solution
+                        nextSolutionButton.setEnabled(allSolutions.size() > 1);
                     } else {
                         JOptionPane.showMessageDialog(panelReinas.this, "No solutions found.");
                     }
                     solveButton.setEnabled(true); // Re-enable button
                 });
             }).start();
+        });
+
+        // Next solution button action
+        nextSolutionButton.addActionListener(e -> {
+            if (allSolutions != null && !allSolutions.isEmpty()) {
+                currentSolutionIndex = (currentSolutionIndex + 1) % allSolutions.size();
+                solutionArea.setText("Solution " + (currentSolutionIndex + 1) + " of " +
+                        allSolutions.size() + "\n");
+                showSolutionOnBoard(allSolutions.get(currentSolutionIndex));
+            }
         });
 
         // Back button action
