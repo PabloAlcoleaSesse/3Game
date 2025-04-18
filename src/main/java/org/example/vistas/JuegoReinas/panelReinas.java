@@ -97,7 +97,16 @@ public class panelReinas extends JPanel {
 
         // Place queens on the board
         for (Ficha queen : solution) {
-            boardCells[queen.getFila()][queen.getColumna()].setText("Q");
+            ImageIcon originalIcon = new ImageIcon("src/main/java/org/example/Recursos/img/Queen.png");
+            Image scaledImage = originalIcon.getImage().getScaledInstance(
+                    boardCells[queen.getFila()][queen.getColumna()].getWidth(),
+                    boardCells[queen.getFila()][queen.getColumna()].getHeight(),
+                    Image.SCALE_SMOOTH
+            );
+            ImageIcon scaledIcon = new ImageIcon(scaledImage);
+
+            boardCells[queen.getFila()][queen.getColumna()].setIcon(scaledIcon);
+            boardCells[queen.getFila()][queen.getColumna()].setForeground(Color.RED);
             boardCells[queen.getFila()][queen.getColumna()].setFont(new Font("Poppins", Font.BOLD, 20));
             boardCells[queen.getFila()][queen.getColumna()].setForeground(Color.RED);
         }
