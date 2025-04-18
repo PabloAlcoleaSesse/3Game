@@ -6,6 +6,7 @@ import java.util.List;
 import javax.swing.*;
 import org.example.problemas.Ficha;
 import org.example.problemas.ochoReinas.Reinas;
+import org.example.BD.BaseDeDatos;
 
 public class panelReinas extends JPanel {
     private CardLayout cardLayout;
@@ -63,6 +64,10 @@ public class panelReinas extends JPanel {
             new Thread(() -> {
                 Reinas solver = new Reinas(boardSize);
                 solver.resolver(true); // Find all solutions
+
+                // Inside solveButton.addActionListener after finding solutions
+                BaseDeDatos db = new BaseDeDatos();
+                db.recordQueensGame(boardSize, solver.getSoluciones());
 
                 SwingUtilities.invokeLater(() -> {
                     List<List<Ficha>> solutions = solver.getSoluciones();

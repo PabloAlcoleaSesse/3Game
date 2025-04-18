@@ -5,6 +5,7 @@ import java.util.List;
 import javax.swing.*;
 import org.example.problemas.Ficha;
 import org.example.problemas.TorresHanoi.Torres;
+import org.example.BD.BaseDeDatos;
 
 public class panelHanoi extends JPanel {
     private CardLayout cardLayout;
@@ -73,6 +74,11 @@ public class panelHanoi extends JPanel {
             Torres solver = new Torres(numDiscos);
             solver.resolver();
             movimientos = solver.getMovimientos();
+
+            // Inside solveButton.addActionListener
+            BaseDeDatos db = new BaseDeDatos();
+            db.recordHanoiGame(numDiscos, solver.getMovimientos());
+
             animateSolution();
             solveButton.setEnabled(true);
         });

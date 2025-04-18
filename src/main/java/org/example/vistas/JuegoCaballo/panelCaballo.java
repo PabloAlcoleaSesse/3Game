@@ -6,6 +6,7 @@ import java.util.List;
 import javax.swing.*;
 import org.example.problemas.Ficha;
 import org.example.problemas.caballo.caballo;
+import org.example.BD.BaseDeDatos;
 
 public class panelCaballo extends JPanel {
     private CardLayout cardLayout;
@@ -68,6 +69,10 @@ public class panelCaballo extends JPanel {
                     if (solved) {
                         List<Ficha> moveHistory = solver.getMoveHistory();
                         showMovesOnBoard(moveHistory);
+
+                        // Record the game after solving
+                        BaseDeDatos db = new BaseDeDatos();
+                        db.recordKnightGame(boardSize, solver.getMoveHistory());
                     } else {
                         JOptionPane.showMessageDialog(panelCaballo.this, "No solution exists for the knight's tour.");
                     }
@@ -75,7 +80,6 @@ public class panelCaballo extends JPanel {
                 });
             }).start();
         });
-
         // Back button action
         backButton.addActionListener(e -> cardLayout.show(mainPanel, "Inicio"));
     }
