@@ -5,6 +5,7 @@ import javax.swing.*;
 import org.example.vistas.JuegoCaballo.panelCaballo;
 import org.example.vistas.JuegoReinas.panelReinas;
 import org.example.vistas.TorresHanoi.panelHanoi;
+import org.example.vistas.Historial.PanelHistorial;
 
 public class mi_ventana extends JFrame {
     public mi_ventana() {
@@ -46,6 +47,19 @@ public class mi_ventana extends JFrame {
 
         gbc.gridy = 2;
         panelOpcion.add(botonReinas, gbc);
+
+        // Add game records button
+        JButton showRecordsButton = new JButton("Mostrar registros del juego");
+        showRecordsButton.setFont(new Font("Poppins", Font.BOLD, 14));
+        showRecordsButton.addActionListener(e -> {
+            PanelHistorial historialPanel = new PanelHistorial();
+            historialPanel.getBotonVolver().addActionListener(ev -> cardLayout.show(mainPanel, "Inicio"));
+            mainPanel.add(historialPanel, "RecordsPanel");
+            cardLayout.show(mainPanel, "RecordsPanel");
+        });
+
+        gbc.gridy = 3;
+        panelOpcion.add(showRecordsButton, gbc);
 
         panelInicio.add(panelOpcion, BorderLayout.CENTER);
 

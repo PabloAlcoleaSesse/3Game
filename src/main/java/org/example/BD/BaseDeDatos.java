@@ -454,4 +454,38 @@ public class BaseDeDatos {
             System.err.println("Error writing recent records back to file: " + e.getMessage());
         }
     }
+    // Add these methods to your BaseDeDatos class
+
+    public List<Integer> getKnightGameIds() {
+        List<Integer> gameIds = new ArrayList<>();
+        // This would normally fetch from your database
+        // For demonstration, I'll create some sample IDs
+        for (int i = 1; i <= 5; i++) {
+            gameIds.add(i);
+        }
+        return gameIds;
+    }
+
+    public List<Ficha> getKnightGameMoves(int gameId) {
+        List<Ficha> moves = new ArrayList<>();
+        // This would normally fetch from your database
+        // For demonstration, I'll create some sample moves based on your data
+
+        // Sample data from the provided long list
+        String[] data = {"79,7,6,4", "80,1,0,5", "81,2,1,0", "82,3,2,3", "83,4,3,2"};
+
+        for (String moveData : data) {
+            String[] parts = moveData.split(",");
+            if (parts.length >= 4) {
+                int moveNumber = Integer.parseInt(parts[0]);
+                int row = Integer.parseInt(parts[2]);
+                int col = Integer.parseInt(parts[3]);
+                moves.add(new Ficha(Ficha.Tipo.CABALLO, row, col));
+            }
+        }
+
+        return moves;
+    }
+
+
 }
