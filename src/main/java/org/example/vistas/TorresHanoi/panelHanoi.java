@@ -1,11 +1,27 @@
+// File: src/main/java/org/example/vistas/TorresHanoi/panelHanoi.java
 package org.example.vistas.TorresHanoi;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
-import org.example.problemas.Ficha;
-import org.example.problemas.TorresHanoi.Torres;
-import org.example.BD.BaseDeDatos;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
+
+import org.example.Controlador.BaseDeDatosControlador;
 
 public class panelHanoi extends JPanel {
     private CardLayout cardLayout;
@@ -22,7 +38,6 @@ public class panelHanoi extends JPanel {
 
         setLayout(new BorderLayout());
 
-        // Create the towers panel with fixed height for better disk visualization
         JPanel towersPanel = new JPanel(new GridLayout(1, 3, 10, 0));
         towersPanel.setPreferredSize(new Dimension(600, 300));
         towersPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -33,32 +48,24 @@ public class panelHanoi extends JPanel {
             towers[i].setLayout(new BoxLayout(towers[i], BoxLayout.Y_AXIS));
             towers[i].setBorder(BorderFactory.createTitledBorder("Tower " + (char)('A' + i)));
             towers[i].setBackground(Color.LIGHT_GRAY);
-
-            // Add a filler component at the top to push disks to the bottom
             towers[i].add(Box.createVerticalGlue());
-
             towersPanel.add(towers[i]);
         }
         add(towersPanel, BorderLayout.CENTER);
 
-        // Create the move history area
         moveHistoryArea = new JTextArea(10, 20);
         moveHistoryArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(moveHistoryArea);
         add(scrollPane, BorderLayout.EAST);
 
-        // Solve button
         JButton solveButton = new JButton("Solve Towers of Hanoi");
         add(solveButton, BorderLayout.NORTH);
 
-        // Back button
         JButton backButton = new JButton("Back to Menu");
         add(backButton, BorderLayout.SOUTH);
 
-        // Initialize the disks on the first tower
         initializeDisks();
 
-        // Solve button action
         solveButton.addActionListener(e -> {
             solveButton.setEnabled(false);
             moveHistoryArea.setText(""); // Clear previous moves
@@ -71,32 +78,28 @@ public class panelHanoi extends JPanel {
             }
             initializeDisks();
 
+            // Solve the Towers of Hanoi problem
             Torres solver = new Torres(numDiscos);
             solver.resolver();
             movimientos = solver.getMovimientos();
 
-            // Inside solveButton.addActionListener
-            BaseDeDatos db = new BaseDeDatos();
-            db.recordHanoiGame(numDiscos, solver.getMovimientos());
+            // Record the game after solving
+            BaseDeDatosControlador dbControlador = new BaseDeDatosControlador();
+            dbControlador.recordTowerOfHanoiGame(numDiscos, movimientos);
 
+            // Animate the solution
             animateSolution();
             solveButton.setEnabled(true);
         });
 
-        // Back button action
         backButton.addActionListener(e -> cardLayout.show(mainPanel, "Inicio"));
     }
 
     private void initializeDisks() {
-        // Add disks to the first tower (largest at the bottom)
         for (int i = numDiscos; i >= 1; i--) {
-            // Create disk with size i (largest to smallest)
             JPanel disk = createDisk(i);
-            // Add disk to the first tower after the glue component
-            towers[0].add(disk, 1);  // Index 1 is right after the glue component
+            towers[0].add(disk, 1);
         }
-
-        // Update UI
         for (JPanel tower : towers) {
             tower.revalidate();
             tower.repaint();
@@ -111,18 +114,14 @@ public class panelHanoi extends JPanel {
         disk.setBackground(getDiskColor(size));
         disk.setBorder(BorderFactory.createRaisedBevelBorder());
         disk.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // Add a label with the disk size for clarity
         JLabel label = new JLabel(String.valueOf(size));
         label.setForeground(Color.WHITE);
         label.setHorizontalAlignment(SwingConstants.CENTER);
         disk.add(label);
-
         return disk;
     }
 
     private Color getDiskColor(int size) {
-        // Generate different colors for different disk sizes
         float hue = (float) size / numDiscos;
         return Color.getHSBColor(hue, 0.8f, 0.8f);
     }
@@ -134,13 +133,12 @@ public class panelHanoi extends JPanel {
         timer.addActionListener(e -> {
             if (moveIndex[0] < movimientos.size()) {
                 String move = movimientos.get(moveIndex[0]);
-                // Add move number to the history
                 moveHistoryArea.append("Move " + (moveIndex[0] + 1) + ": " + move + "\n");
-                executeMove(move);
+                executeMove(move); // Execute the move
                 moveHistoryArea.setCaretPosition(moveHistoryArea.getDocument().getLength());
                 moveIndex[0]++;
             } else {
-                ((Timer) e.getSource()).stop();
+                ((Timer) e.getSource()).stop(); // Stop the timer when all moves are executed
             }
         });
 
@@ -149,36 +147,29 @@ public class panelHanoi extends JPanel {
 
     private void executeMove(String move) {
         try {
+            // Parse the move string
             String[] parts = move.split(" ");
-            int diskNum = Integer.parseInt(parts[2]);
-            int fromTower = parts[4].charAt(0) - 'A';
-            int toTower = parts[6].charAt(0) - 'A';
+            int diskNum = Integer.parseInt(parts[1]); // Disk number is the second word
+            int fromTower = parts[3].charAt(0) - 'A'; // From tower is the fourth word
+            int toTower = parts[5].charAt(0) - 'A';   // To tower is the sixth word
 
-            // Find the disk with the specified size
+            // Locate the disk in the fromTower
             Component diskComponent = null;
             for (Component comp : towers[fromTower].getComponents()) {
                 if (comp instanceof JPanel) {
                     JPanel panel = (JPanel) comp;
-                    // Check if this is the right disk by finding its label
-                    for (Component c : panel.getComponents()) {
-                        if (c instanceof JLabel && ((JLabel) c).getText().equals(String.valueOf(diskNum))) {
-                            diskComponent = panel;
-                            break;
-                        }
+                    JLabel label = (JLabel) panel.getComponent(0); // Get the label inside the disk
+                    if (label.getText().equals(String.valueOf(diskNum))) {
+                        diskComponent = panel;
+                        break;
                     }
-                    if (diskComponent != null) break;
                 }
             }
 
+            // Move the disk to the toTower
             if (diskComponent != null) {
-                // Remove the disk from the source tower
                 towers[fromTower].remove(diskComponent);
-
-                // Add the disk to the destination tower after the glue component but before any other disks
-                // This ensures the disks stack properly with largest at the bottom
-                towers[toTower].add(diskComponent, 1);
-
-                // Ensure the disk is displayed correctly
+                towers[toTower].add(diskComponent, 1); // Add the disk to the top of the toTower
                 towers[fromTower].revalidate();
                 towers[fromTower].repaint();
                 towers[toTower].revalidate();
@@ -188,5 +179,33 @@ public class panelHanoi extends JPanel {
             System.err.println("Error executing move: " + ex.getMessage());
             ex.printStackTrace();
         }
+    }
+}
+
+class Torres {
+    private List<String> movimientos;
+    private int numDiscos;
+
+    public Torres(int numDiscos) {
+        this.numDiscos = numDiscos;
+        movimientos = new ArrayList<>();
+    }
+
+    public void resolver() {
+        moverDiscos(numDiscos, 'A', 'C', 'B');
+    }
+
+    private void moverDiscos(int n, char origen, char destino, char auxiliar) {
+        if (n == 1) {
+            movimientos.add("Move 1 from " + origen + " to " + destino);
+        } else {
+            moverDiscos(n - 1, origen, auxiliar, destino);
+            movimientos.add("Move " + n + " from " + origen + " to " + destino);
+            moverDiscos(n - 1, auxiliar, destino, origen);
+        }
+    }
+
+    public List<String> getMovimientos() {
+        return movimientos;
     }
 }

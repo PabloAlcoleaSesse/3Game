@@ -4,9 +4,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.*;
-import org.example.problemas.Ficha;
-import org.example.problemas.caballo.caballo;
-import org.example.BD.BaseDeDatos;
+import org.example.Modelo.Ficha;
+import org.example.Controlador.caballo.caballo;
+import org.example.Controlador.BaseDeDatosControlador;
 
 public class panelCaballo extends JPanel {
     private CardLayout cardLayout;
@@ -59,6 +59,7 @@ public class panelCaballo extends JPanel {
         add(backButton, BorderLayout.SOUTH);
 
         // Solve button action
+        // Solve button action in panelCaballo.java
         solveButton.addActionListener(e -> {
             solveButton.setEnabled(false); // Disable button during computation
             new Thread(() -> {
@@ -70,11 +71,11 @@ public class panelCaballo extends JPanel {
                         List<Ficha> moveHistory = solver.getMoveHistory();
                         showMovesOnBoard(moveHistory);
 
-                        // Record the game after solving
-                        BaseDeDatos db = new BaseDeDatos();
-                        db.recordKnightGame(boardSize, solver.getMoveHistory());
+                        // Record the game after solving using the controller method
+                        BaseDeDatosControlador dbControlador = new BaseDeDatosControlador();
+                        dbControlador.recordKnightGame(boardSize, moveHistory);
                     } else {
-                        JOptionPane.showMessageDialog(panelCaballo.this, "No solution exists for the knight's tour.");
+                        JOptionPane.showMessageDialog(panelCaballo.this, "No solution exists for the knight\'s tour.");
                     }
                     solveButton.setEnabled(true); // Re-enable button
                 });

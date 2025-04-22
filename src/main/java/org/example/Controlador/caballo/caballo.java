@@ -1,6 +1,6 @@
-package org.example.problemas.caballo;
+package org.example.Controlador.caballo;
 
-import org.example.problemas.Ficha;
+import org.example.Modelo.Ficha;
 import java.util.ArrayList;
 import java.util.List;
 

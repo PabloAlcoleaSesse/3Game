@@ -1,6 +1,6 @@
-package org.example.problemas.ochoReinas;
+package org.example.Controlador.ochoReinas;
 
-import org.example.problemas.Ficha;
+import org.example.Modelo.Ficha;
 import java.util.ArrayList;
 import java.util.List;
 
