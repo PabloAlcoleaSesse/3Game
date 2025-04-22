@@ -1,8 +1,7 @@
-
 package org.example.vistas.Historial;
 
 import org.example.Modelo.Ficha;
-import org.example.Controlador.BD.MostrarBD;
+import org.example.Controlador.BaseDeDatosControlador;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -16,8 +15,10 @@ public class PanelHistorial extends JPanel {
     private JComboBox<String> filtroProblema;
     private JButton btnVolver;
     private JPanel panelFiltros;
+    private final BaseDeDatosControlador controlador;
 
     public PanelHistorial() {
+        this.controlador = new BaseDeDatosControlador();
         setLayout(new BorderLayout());
         inicializarComponentes();
         cargarDatos();
@@ -74,7 +75,7 @@ public class PanelHistorial extends JPanel {
         tableModel.setRowCount(0);
 
         // Obtener datos históricos
-        List<Map<String, Object>> registros = MostrarBD.obtenerHistorialJuegos();
+        List<Map<String, Object>> registros = controlador.obtenerHistorialJuegos();
 
         // Añadir filas a la tabla
         for (Map<String, Object> registro : registros) {
@@ -105,7 +106,7 @@ public class PanelHistorial extends JPanel {
         else if (filtro.equals("Torres de Hanoi")) tipoFicha = Ficha.Tipo.DISCO;
 
         // Filtrar registros
-        List<Map<String, Object>> registros = MostrarBD.obtenerHistorialJuegosPorTipo(tipoFicha);
+        List<Map<String, Object>> registros = controlador.obtenerHistorialJuegosPorTipo(tipoFicha.name().toLowerCase());
 
         // Añadir filas filtradas
         for (Map<String, Object> registro : registros) {

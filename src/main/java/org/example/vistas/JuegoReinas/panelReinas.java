@@ -1,3 +1,4 @@
+// File: src/main/java/org/example/vistas/JuegoReinas/panelReinas.java
 package org.example.vistas.JuegoReinas;
 
 import java.awt.*;
@@ -5,7 +6,7 @@ import java.util.List;
 import javax.swing.*;
 import org.example.Modelo.Ficha;
 import org.example.Controlador.ochoReinas.Reinas;
-import org.example.Controlador.BD.BaseDeDatos;
+import org.example.Controlador.BaseDeDatosControlador;
 
 public class panelReinas extends JPanel {
     private CardLayout cardLayout;
@@ -14,18 +15,16 @@ public class panelReinas extends JPanel {
     private JLabel[][] boardCells;
     private JTextArea solutionArea;
     private int boardSize;
-    private List<List<Ficha>> allSolutions; // Store all solutions
-    private int currentSolutionIndex = 0; // Track current solution being shown
-    private JButton nextSolutionButton; // Button to show next solution
+    private List<List<Ficha>> allSolutions;
+    private int currentSolutionIndex = 0;
+    private JButton nextSolutionButton;
 
     public panelReinas(CardLayout cardLayout, JPanel mainPanel, int boardSize) {
         this.cardLayout = cardLayout;
         this.mainPanel = mainPanel;
         this.boardSize = boardSize;
-
         setLayout(new BorderLayout());
 
-        // Create the board panel
         boardPanel = new JPanel(new GridLayout(boardSize, boardSize)) {
             @Override
             public Dimension getPreferredSize() {
@@ -46,62 +45,51 @@ public class panelReinas extends JPanel {
         }
         add(boardPanel, BorderLayout.CENTER);
 
-        // Create the solution area
         solutionArea = new JTextArea(10, 20);
         solutionArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(solutionArea);
         add(scrollPane, BorderLayout.EAST);
 
-        // Create a panel for buttons at the top
         JPanel topPanel = new JPanel(new FlowLayout());
-
-        // Solve button
         JButton solveButton = new JButton("Solve N-Queens");
         topPanel.add(solveButton);
-
-        // Next solution button (initially disabled)
         nextSolutionButton = new JButton("Next Solution");
         nextSolutionButton.setEnabled(false);
         topPanel.add(nextSolutionButton);
-
         add(topPanel, BorderLayout.NORTH);
 
-        // Back button
         JButton backButton = new JButton("Back to Menu");
         add(backButton, BorderLayout.SOUTH);
 
-        // Solve button action
         solveButton.addActionListener(e -> {
-            solveButton.setEnabled(false); // Disable button during computation
-            nextSolutionButton.setEnabled(false); // Disable next solution button
-            currentSolutionIndex = 0; // Reset solution index
+            solveButton.setEnabled(false);
+            nextSolutionButton.setEnabled(false);
+            currentSolutionIndex = 0;
 
             new Thread(() -> {
                 Reinas solver = new Reinas(boardSize);
-                solver.resolver(true); // Find all solutions
-
-                // Inside solveButton.addActionListener after finding solutions
-                BaseDeDatos db = new BaseDeDatos();
-                db.recordQueensGame(boardSize, solver.getSoluciones());
+                solver.resolver(true);
 
                 SwingUtilities.invokeLater(() -> {
                     allSolutions = solver.getSoluciones();
                     if (!allSolutions.isEmpty()) {
                         solutionArea.setText("Solution " + (currentSolutionIndex + 1) + " of " +
                                 allSolutions.size() + "\n");
-                        showSolutionOnBoard(allSolutions.get(currentSolutionIndex)); // Show the first solution
+                        showSolutionOnBoard(allSolutions.get(currentSolutionIndex));
 
-                        // Enable next solution button if there's more than one solution
                         nextSolutionButton.setEnabled(allSolutions.size() > 1);
+
+                        // Record queens solutions in the database
+                        BaseDeDatosControlador dbControlador = new BaseDeDatosControlador();
+                        dbControlador.recordQueenGameSolutions(boardSize, allSolutions);
                     } else {
                         JOptionPane.showMessageDialog(panelReinas.this, "No solutions found.");
                     }
-                    solveButton.setEnabled(true); // Re-enable button
+                    solveButton.setEnabled(true);
                 });
             }).start();
         });
 
-        // Next solution button action
         nextSolutionButton.addActionListener(e -> {
             if (allSolutions != null && !allSolutions.isEmpty()) {
                 currentSolutionIndex = (currentSolutionIndex + 1) % allSolutions.size();
@@ -111,20 +99,16 @@ public class panelReinas extends JPanel {
             }
         });
 
-        // Back button action
         backButton.addActionListener(e -> cardLayout.show(mainPanel, "Inicio"));
     }
 
     private void showSolutionOnBoard(List<Ficha> solution) {
-        // Clear the board
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 boardCells[i][j].setText("");
                 boardCells[i][j].setIcon(null);
             }
         }
-
-        // Place queens on the board
         for (Ficha queen : solution) {
             ImageIcon originalIcon = new ImageIcon("src/main/java/org/example/Recursos/img/Queen.png");
             Image scaledImage = originalIcon.getImage().getScaledInstance(
@@ -137,7 +121,6 @@ public class panelReinas extends JPanel {
             boardCells[queen.getFila()][queen.getColumna()].setIcon(scaledIcon);
             boardCells[queen.getFila()][queen.getColumna()].setForeground(Color.RED);
             boardCells[queen.getFila()][queen.getColumna()].setFont(new Font("Poppins", Font.BOLD, 20));
-            boardCells[queen.getFila()][queen.getColumna()].setForeground(Color.RED);
         }
     }
 }
