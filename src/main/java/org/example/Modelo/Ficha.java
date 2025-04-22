@@ -1,4 +1,4 @@
-package org.example.problemas;
+package org.example.Modelo;
 
 public class Ficha {
 

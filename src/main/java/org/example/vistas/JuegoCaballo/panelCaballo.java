@@ -4,9 +4,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.*;
-import org.example.problemas.Ficha;
-import org.example.problemas.caballo.caballo;
-import org.example.BD.BaseDeDatos;
+import org.example.Modelo.Ficha;
+import org.example.Controlador.caballo.caballo;
+import org.example.Controlador.BD.BaseDeDatos;
 
 public class panelCaballo extends JPanel {
     private CardLayout cardLayout;

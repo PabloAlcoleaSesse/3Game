@@ -1,6 +1,6 @@
-package org.example.problemas.TorresHanoi;
+package org.example.Controlador.TorresHanoi;
 
-import org.example.problemas.Ficha;
+import org.example.Modelo.Ficha;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;

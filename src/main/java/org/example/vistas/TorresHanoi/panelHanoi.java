@@ -3,9 +3,9 @@ package org.example.vistas.TorresHanoi;
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
-import org.example.problemas.Ficha;
-import org.example.problemas.TorresHanoi.Torres;
-import org.example.BD.BaseDeDatos;
+
+import org.example.Controlador.TorresHanoi.Torres;
+import org.example.Controlador.BD.BaseDeDatos;
 
 public class panelHanoi extends JPanel {
     private CardLayout cardLayout;

@@ -1,6 +1,6 @@
-package org.example.BD;
+package org.example.Controlador.BD;
 
-import org.example.problemas.Ficha;
+import org.example.Modelo.Ficha;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

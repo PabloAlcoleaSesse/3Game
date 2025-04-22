@@ -1,8 +1,8 @@
 
 package org.example.vistas.Historial;
 
-import org.example.problemas.Ficha;
-import org.example.BD.MostrarBD;
+import org.example.Modelo.Ficha;
+import org.example.Controlador.BD.MostrarBD;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

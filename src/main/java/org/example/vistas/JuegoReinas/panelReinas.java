@@ -1,12 +1,11 @@
 package org.example.vistas.JuegoReinas;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.util.List;
 import javax.swing.*;
-import org.example.problemas.Ficha;
-import org.example.problemas.ochoReinas.Reinas;
-import org.example.BD.BaseDeDatos;
+import org.example.Modelo.Ficha;
+import org.example.Controlador.ochoReinas.Reinas;
+import org.example.Controlador.BD.BaseDeDatos;
 
 public class panelReinas extends JPanel {
     private CardLayout cardLayout;

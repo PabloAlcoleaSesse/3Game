@@ -1,7 +1,7 @@
 
-package org.example.BD;
+package org.example.Controlador.BD;
 
-import org.example.problemas.Ficha;
+import org.example.Modelo.Ficha;
 
 import java.io.*;
 import java.nio.file.*;
